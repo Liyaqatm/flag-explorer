@@ -1,0 +1,97 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.openapi.generator' version '7.2.0'
+}
+
+group = 'com.om'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// Swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+	// OpenAPI Generator dependencies
+	implementation 'io.swagger.core.v3:swagger-annotations:2.2.15'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// Testing
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+def generatedSourcesDir = "${buildDir}/generated-sources/openapi"
+
+// Configure OpenAPI Generator
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "${projectDir}/src/main/resources/api-spec.yaml"
+	outputDir = generatedSourcesDir
+	apiPackage = "com.om.api"
+	modelPackage = "com.om.model"
+	configOptions = [
+			dateLibrary: "java8",
+			interfaceOnly: "true",
+			delegatePattern: "false",
+			useTags: "true",
+			useSpringBoot3: "true",
+			hideGenerationTimestamp: "true",
+			openApiNullable: "false",
+			skipDefaultInterface: "true"
+	]
+}
+
+// Add generated sources to main source set
+sourceSets {
+	main {
+		java {
+			srcDir "$generatedSourcesDir/src/main/java"
+		}
+	}
+}
+
+// Make sure the code is generated before compiling
+compileJava.dependsOn('openApiGenerate')
+
+// Add task for manual generation
+task generateApi(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+	generatorName = "spring"
+	inputSpec = "${projectDir}/src/main/resources/api-spec.yaml"
+	outputDir = generatedSourcesDir
+	apiPackage = "com.om.api"
+	modelPackage = "com.om.model"
+	configOptions = [
+			dateLibrary: "java8",
+			interfaceOnly: "true",
+			delegatePattern: "false",
+			useTags: "true",
+			useSpringBoot3: "true",
+			hideGenerationTimestamp: "true",
+			openApiNullable: "false",
+			skipDefaultInterface: "true"
+	]
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
