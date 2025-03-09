@@ -47,7 +47,7 @@ Flag Explorer is a comprehensive web application that allows users to browse and
 
 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/flag-explorer.git
+git clone https://github.com/Liyaqatm/flag-explorer.git
 cd flag-explorer
 ```
 
@@ -118,4 +118,4 @@ npm run test:unit
 
 ## 📧 Contact
 Liyaqat M
-- GitHub: @yourgithubhandle
+- GitHub: @Liyaqatm
